@@ -29,7 +29,7 @@ class Cart:
         if game in self._cart:
             self._cart.remove(game)
         else:
-            print("404 not found")
+            print("GameNotFound")
 
     def view_cart(self):
         if len(self._cart) == 0:
@@ -40,13 +40,6 @@ class Cart:
 
     def total_price(self):
         return sum(game._price for game in self._cart)
-
-    
-class User:
-    def __init__(self, username, password, email):
-        self._username = username
-        self._password = password
-        self._email = email
 
 
 
@@ -73,10 +66,6 @@ cart1.remove_game(list1[0])
 cart1.view_cart()
 
 print(cart1.total_price())
-
-# sdojgoadhgohe;a
-# user1 = User('John', 1234, 'John@gmail.com')
-# user2 = User('Tom', 5678, 'Tom@gmail.com')
 
 
 
