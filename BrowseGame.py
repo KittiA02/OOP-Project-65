@@ -3,6 +3,9 @@ class Game:
         self.name = name
         self.price = price
         self.details = details
+        
+    def get_info(self):
+        return f"{self.name} ({self.price} Baht) - {self.details}"
 
 class GameList:
     def __init__(self):
@@ -58,9 +61,8 @@ game = catalog.get_game_by_name(game_name)
 
 if game is not None:
     print("\nGame found:")
-    game.display()
+    print(game.get_info())
     print("\n")
 else:
     print("\nGame not found.")
     print("\n")
-
