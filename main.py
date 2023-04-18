@@ -48,18 +48,7 @@ class Cart:
     def total_price(self):
         return sum(game.price for game in self.cart)
 
-
 list1 = GameList()
-
-# Read the JSON data from the file
-with open('games.json') as f:
-    data = json.load(f)
-
-# Create Game objects from the JSON data and add them to the GameList
-for game_data in data:
-    game = Game(game_data['name'], game_data['price'], game_data['detail'])
-    list1.add_to_list(game)
-
 cart1 = Cart()
 
 @app.get("/games")
@@ -96,5 +85,5 @@ async def add_to_cart(game_index: int):
 async def view_cart():
     return cart1.view_cart()
 
-if __name__ == '__main__':
-    uvicorn.run(app, host='172.17.208.1', port=8000)
+# if __name__ == '__main__':
+#     uvicorn.run(app, host='127.0.0.1', port=8000)
