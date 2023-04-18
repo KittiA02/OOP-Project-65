@@ -32,7 +32,7 @@ class GameCatalog:
                 return game
         return None
 
-# Example usage:
+## Example usage:
 game1 = Game("GTA V", 1850, "Open-world action-adventure game.")
 game2 = Game("Minecraft", 790, "Sandbox game where you can build and explore.")
 game3 = Game("Fortnite", 0, "Battle royale game with cartoon graphics.")
