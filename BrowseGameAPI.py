@@ -1,3 +1,4 @@
+import json
 from fastapi import FastAPI, APIRouter
 from pydantic import BaseModel
 from fastapi.responses import JSONResponse
@@ -27,19 +28,21 @@ class GameList:
 class GameCatalog:
     def __init__(self, game_list):
         self.game_list = game_list
-        
+
     def display_games(self):
-        game_info = [f"{game.name} ({game.price} Baht) - {game.details}" for game in self.game_list.games]
-        return "\n".join(game_info)
+        game_list = []
+        for game in self.game_list.games:
+            game_list.append({"name": game.name, "price": game.price, "details": game.details})
+        return game_list
+
+    def add_game(self, game):
+        self.game_list.add_game(game)
 
     def get_game_by_name(self, name):
         for game in self.game_list.games:
             if game.name == name:
                 return {"name": game.name, "price": game.price, "details": game.details}
         return None
-    
-    def add_game(self, game):
-        self.game_list.add_game(game)
 
 # Example usage:
 game1 = Game("GTA V", 1850, "Open-world action-adventure game.")
@@ -67,7 +70,8 @@ app.include_router(router)
 # Define an endpoint to display all the games in the catalog
 @app.get("/games")
 def display_games():
-    return catalog.display_games()
+    games = catalog.display_games()
+    return JSONResponse(content=games, indent=4)
 
 # Define an endpoint to get a game by name
 @app.get("/games/{name}")
@@ -90,15 +94,6 @@ def add_game(game: GameInput):
     catalog.add_game(new_game)
     return JSONResponse(content=catalog.display_games(), indent=4)
 
-@app.get("/games/{name}")
-def get_game_by_name(name: str):
-    game = catalog.get_game_by_name(name)
-    if game is not None:
-        return game
-    else:
-        return {"error": "Game not found."}
-
-
 # Run the FastAPI app using the uvicorn server
 if __name__ == "__main__":
-    uvicorn.run(app, host="172.20.10.4", port=8000)
+    uvicorn.run(app, host="192.168.1.41", port=8000)
