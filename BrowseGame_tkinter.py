@@ -1,5 +1,6 @@
 import tkinter as tk
 
+
 class Game:
     def __init__(self, name, price, details):
         self.name = name
@@ -9,14 +10,20 @@ class Game:
     def get_info(self):
         return f"{self.name} ({self.price} Baht) - {self.details}"
 
+
 class GameButton:
-    def __init__(self, master, game, row, column):
+    def __init__(self, master, game, row, column, app):
         self.game = game
+        self.app = app
         self.button = tk.Button(master, text=self.game.name, command=self.show_info, width=10, height=2)
         self.button.grid(row=row, column=column, padx=10, pady=10)
     
     def show_info(self):
-        print(self.game.get_info())
+        info_window = tk.Toplevel(self.app.master)
+        info_window.title(self.game.name)
+        info_label = tk.Label(info_window, text=self.game.get_info())
+        info_label.pack(padx=10, pady=10)
+
 
 class GameCatalogApp:
     def __init__(self, master, game_list):
@@ -32,7 +39,7 @@ class GameCatalogApp:
         
         self.buttons = []
         for i, game in enumerate(self.game_list):
-            button = GameButton(self.buttons_frame, game, i, 0)
+            button = GameButton(self.buttons_frame, game, i, 0, self)
             self.buttons.append(button)
 
             
@@ -46,7 +53,9 @@ class GameList:
     def browse_games(self):
         return [game.get_info() for game in self.games]
 
+
 root = tk.Tk()
+
 
 # Example usage:
 game1 = Game("GTA V", 1850, "Open-world action-adventure game.")
