@@ -67,7 +67,6 @@ class GameStoreGUI(tk.Frame):
         self.game_details_canvas.configure(yscrollcommand=self.game_details_scrollbar.set)
         self.game_details_canvas.bind('<Configure>', lambda e: self.game_details_canvas.configure(scrollregion=self.game_details_canvas.bbox("all")))
 
-
     def search_games(self):
         self.games_listbox.delete(0, tk.END)
         games = fetch_games()
@@ -76,7 +75,6 @@ class GameStoreGUI(tk.Frame):
         for game in matching_games:
             self.games_listbox.insert(tk.END, game.name)
         self.games_listbox.bind('<<ListboxSelect>>', lambda e: self.show_game_details(matching_games))
-
 
     def show_game_details(self, games: List[Game]):
         # Clear the game details frame
