@@ -34,15 +34,17 @@ class GameStoreGUI(tk.Frame):
         self.create_widgets()
 
     def create_widgets(self):
-        self.search_label = tk.Label(self, text="Games Today", font=("Trebuchet MS", 24, "bold"))
+        self.search_label = tk.Label(self, text="Games Today", font=("Trebuchet MS", 32, "bold"))
         self.search_label.grid(row=1, column=0, pady=(20, 10))
 
         self.search_entry = tk.Entry(self, width=60, font=("Trebuchet MS", 14))
         self.search_entry.grid(row=1, column=1, padx=(20, 30), pady=(20, 10))
 
-        self.search_button = tk.Button(self, text="Search", command=self.search_games, font=("Trebuchet MS", 11, "bold"))
+        self.search_button = tk.Button(self, text="Search", command=self.search_games, font=("Trebuchet MS", 14, "bold"))
         self.search_button.grid(row=1, column=2, padx=(10, 20), pady=(20, 10))
 
+        # Bind the Return key to the search button
+        self.search_entry.bind('<Return>', lambda e: self.search_button.invoke())
 
         self.games_listbox = tk.Listbox(self, height=20, width=40, font=("Open Sans", 13))
         self.games_listbox.grid(row=2, column=0, padx=10, pady=10, rowspan=5)
@@ -67,7 +69,10 @@ class GameStoreGUI(tk.Frame):
         self.game_details_canvas.configure(yscrollcommand=self.game_details_scrollbar.set)
         self.game_details_canvas.bind('<Configure>', lambda e: self.game_details_canvas.configure(scrollregion=self.game_details_canvas.bbox("all")))
 
+
     def search_games(self):
+        query = self.search_entry.get()
+        self.search_label.config(text=f"Results for '{query}'")
         self.games_listbox.delete(0, tk.END)
         games = fetch_games()
         search_query = self.search_entry.get().lower()
@@ -96,15 +101,19 @@ class GameStoreGUI(tk.Frame):
 
         # Set the font size and style for game name, price, and details
         name_font = ("Open Sans", 32, "bold")
-        price_font = ("Open Sans", 24, "bold")
-        details_font = ("Open Sans", 16)
+        details_font = ("Open Sans", 14)
 
         # Use a label widget to display the game details
         game_details = tk.Label(self.games_details_frame, font=name_font, text=selected_game.name)
         game_details.pack(side="top", padx=10, pady=5)
 
-        price_label = tk.Label(self.games_details_frame, font=price_font, text=f"Price: {selected_game.price}")
+        price_label = tk.Label(self.games_details_frame, font=("Open Sans", 24, "bold"), text="Price:")
         price_label.pack(side="top", padx=10, pady=3)
+
+        price_value_label = tk.Label(self.games_details_frame, font=("Open Sans", 24), text=selected_game.price)
+        price_value_label.pack(side="top", padx=0, pady=3)
+        
+        price_label.config(font=("Open Sans", 24))
 
         details_label = tk.Label(self.games_details_frame, font=details_font, text=selected_game.details, wraplength=500)
         details_label.pack(side="top", padx=10, pady=3)
