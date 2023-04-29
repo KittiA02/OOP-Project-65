@@ -4,7 +4,8 @@ import requests
 from typing import List
 
 root = tk.Tk()
-
+root.title("Epic Game Store")
+root.iconbitmap("epic_games_logo_icon_145306.ico")
 class Game:
     def __init__(self, name: str, price: float, details: str, image_url: str):
         self.name = name
@@ -123,5 +124,6 @@ def fetch_games() -> List[Game]:
         games.append(game)
     return games
 
+root.iconbitmap('epic_games_logo_icon_145306.ico')
 app = GameStoreGUI(master=root)
 app.mainloop()
