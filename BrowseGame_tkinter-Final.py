@@ -20,7 +20,6 @@ class Game:
             "details": self.details,
             "image_url": self.image_url
         }
-
 class GamePagination:
     def __init__(self, items: List[Game], total: int):
         self.items = items
@@ -105,13 +104,13 @@ class GameStoreGUI(tk.Frame):
 
         # Use a label widget to display the game details
         game_details = tk.Label(self.games_details_frame, font=name_font, text=selected_game.name)
-        game_details.pack(side="top", padx=10, pady=5)
+        game_details.pack(side="top", padx=10, pady=2)
 
         price_label = tk.Label(self.games_details_frame, font=("Open Sans", 24, "bold"), text="Price:")
-        price_label.pack(side="top", padx=10, pady=3)
+        price_label.pack(side="top", padx=10, pady=0)
 
         price_value_label = tk.Label(self.games_details_frame, font=("Open Sans", 24), text=selected_game.price)
-        price_value_label.pack(side="top", padx=0, pady=3)
+        price_value_label.pack(side="top", padx=0, pady=0)
         
         price_label.config(font=("Open Sans", 24))
 
@@ -131,6 +130,8 @@ def fetch_games() -> List[Game]:
         games.append(game)
     return games
 
+
 root.iconbitmap('epic_games_logo_icon_145306.ico')
+
 app = GameStoreGUI(master=root)
 app.mainloop()
