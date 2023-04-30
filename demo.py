@@ -1,5 +1,4 @@
 import datetime
-import hashlib
 
 class Game:
     def __init__(self, title, price, description):
@@ -41,17 +40,25 @@ class Catalog:
 
 class UserManager:
     def __init__(self):
-        self.users = []
-
-    def add_user(self, user):
-        if isinstance(user, User):
-            self.users.append(user)
-        else:
-            raise TypeError("Object is not of type User.")
+        self._users = []
 
     @property
     def users(self):
-        return self.users
+        return self._users
+    @users.setter
+    def users(self, users):
+        self._users = users
+
+    def add(self, user):
+        if isinstance(user, User):
+            self._users.append(user)
+        else:
+            raise TypeError("Object is not of type User.")
+    def remove(self, user):
+        if isinstance(user, User):
+            self._users.remove(user)
+        else:
+            raise TypeError("Object is not of type User.")
 
 class User:
     def __init__(self, user_info, payment_info, shopping_info):
@@ -72,16 +79,16 @@ class User:
         return self._shopping_info
 
 class Authentication:
-    def __init__(self,user_list):
-        self._users = user_list
+    def __init__(self,user_manager):
+        self._manager = user_manager
 
-    def sign_up(self, username, password, email, user_id):
+    def sign_up(self, username, password, email):
         # Check if username already exists
-        for user in self._users:
+        for user in self._manager.users:
             if user.user_info.username == username:
                 print("Username already exists.")
                 return False
-        
+        user_id = len(self._manager.users)+1
         # Create new user
         user_info = UserInfo(username, password, email, user_id)
         payment_info = PaymentInfo(user_id)
@@ -89,12 +96,12 @@ class Authentication:
         new_user = User(user_info, payment_info, shopping_info)
 
         # Add the new user to the list of users
-        self._users.append(new_user)
+        self._manager.add(new_user)
         print(f"User {username} has been successfully registered.")
         return True
 
     def login(self, username, password):
-        for user in self._users:
+        for user in self._manager.users:
             if user.user_info.username == username:
                 if user.user_info.password == password:
                     print(f"User {username} has successfully logged in.")
@@ -407,35 +414,89 @@ catalog = Catalog()
 for game in games:
     catalog.add_game(game)
 
-user1_info = UserInfo('sunpolll',12345,'64011201@kmitl.ac.th',1)
-payment1 = PaymentInfo(1)
-shopping1 = ShoppingInfo(1,PurchaseHistory(1),UserWishlist(1),ShoppingCart(1))
-user1 = User(user1_info,payment1,shopping1)
-credit1 = CreditCard('card1',12345,'11/24',352)
-paypal1 = Paypal('64011201@kmitl.ac.th',12345)
-user1.payment_info.add_credit_card(credit1)
-user1.payment_info.add_paypal(paypal1)
-for game in catalog.games:
-    print(game.title)
-print(catalog.search_games('GTA V').title)
-game = catalog.search_games('GTA V')
-game1 = catalog.search_games('Minecraft')
-print(game)
-shopping1.user_cart.add_item(game)
-print(shopping1.user_cart.items)
-shopping1.user_cart.single_item = game
-print(shopping1.user_cart.single_item)
-purchase = Purchase(user1)
-paid1 = purchase.cart_purchase_CC(CreditCard('card10',12345,'11/24',352),True)
-print(paid1)
-paid2 = purchase.cart_purchase_PP(Paypal('64011201@kmitl.ac.th',352),True)
-print(paid2)
-paid3 = purchase.one_purchase_CC(CreditCard('card4',12345,'11/24',352),True)
-print(paid3)
-shopping1.user_cart.single_item = game1
-paid4 = purchase.one_purchase_PP(Paypal('64011241@kmitl.ac.th',352),True)
-print(paid4)
-for gm in user1.shopping_info.purchase_history.purchases:
-    print(gm.title, gm.price , gm.date, gm.payment_type, gm.payment_info)
-print(user1.payment_info.credit_card)
-print(user1.payment_info.paypal)
+usermanage = UserManager()
+authentication = Authentication(usermanage)
+# esc = False
+# while esc == False:
+#     login = input("Login or Sign up (1,2): ")
+#     while login not in ['1','2']:
+#         print('Please enter valid value')
+#         login = input("Login or Sign up (1,2): ")
+#     user = object()
+#     if login == '1':
+#         print('Login')
+#         username = input("Username : ")
+#         password = int(input("Password : "))
+#         user = authentication.login(username, password)
+#         while user == False:
+#             print('Login')
+#             username = input("Username : ")
+#             password = int(input("Password : "))
+#             user = authentication.login(username, password)
+#     else:
+#         print('Sign up')
+#         username = input("Username : ")
+#         password = int(input("Password : "))
+#         email = input("Email : ")
+#         user = authentication.sign_up(username, password, email)
+#         while user == False:
+#             username = input("Username : ")
+#             password = int(input("Password : "))
+#             email = input("Email : ")
+#             user = authentication.sign_up(username, password, email)
+#         user = usermanage.users[-1]
+#     shopping = True
+#     while shopping == True:
+#         select = input("Game/Cart/Wishlist (1,2,3): ")
+#         while select not in ['1','2','3']:
+#             print('Please enter valid value')
+#             select = input("Game/Cart/Wishlist (1,2,3): ")
+#         if select == '1':
+#             for order,gm in enumerate(catalog.games):
+#                 print(f'{order}: {gm.title} / {gm.price} bath / {gm.description}')
+#             addwish = input('Which game do you want to add to wishlist? :').split(',')
+#             print(addwish)
+#             for gm in addwish:
+#                 game = catalog.search_games(gm)
+#                 user.shopping_info.user_wishlist.add_item(game)
+#             addcart = input("Which game do you want to add to cart? : ").split(',')
+#             print(addcart)
+#             for gm in addcart:
+#                 game = catalog.search_games(gm)
+#                 user.shopping_info.user_cart.add_item(game)
+#             print(user.shopping_info.user_cart.items)
+#             print(user.shopping_info.user_wishlist.items)
+
+
+# user1_info = UserInfo('sunpolll',12345,'64011201@kmitl.ac.th',1)
+# payment1 = PaymentInfo(1)
+# shopping1 = ShoppingInfo(1,PurchaseHistory(1),UserWishlist(1),ShoppingCart(1))
+# user1 = User(user1_info,payment1,shopping1)
+# credit1 = CreditCard('card1',12345,'11/24',352)
+# paypal1 = Paypal('64011201@kmitl.ac.th',12345)
+# user1.payment_info.add_credit_card(credit1)
+# user1.payment_info.add_paypal(paypal1)
+# for game in catalog.games:
+#     print(game.title)
+# print(catalog.search_games('GTA V').title)
+# game = catalog.search_games('GTA V')
+# game1 = catalog.search_games('Minecraft')
+# print(game)
+# shopping1.user_cart.add_item(game)
+# print(shopping1.user_cart.items)
+# shopping1.user_cart.single_item = game
+# print(shopping1.user_cart.single_item)
+# purchase = Purchase(user1)
+# paid1 = purchase.cart_purchase_CC(CreditCard('card10',12345,'11/24',352),True)
+# print(paid1)
+# paid2 = purchase.cart_purchase_PP(Paypal('64011201@kmitl.ac.th',352),True)
+# print(paid2)
+# paid3 = purchase.one_purchase_CC(CreditCard('card4',12345,'11/24',352),True)
+# print(paid3)
+# shopping1.user_cart.single_item = game1
+# paid4 = purchase.one_purchase_PP(Paypal('64011241@kmitl.ac.th',352),True)
+# print(paid4)
+# for gm in user1.shopping_info.purchase_history.purchases:
+#     print(gm.title, gm.price , gm.date, gm.payment_type, gm.payment_info)
+# print(user1.payment_info.credit_card)
+# print(user1.payment_info.paypal)
