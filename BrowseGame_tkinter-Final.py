@@ -20,7 +20,6 @@ class Game:
             "details": self.details,
             "image_url": self.image_url
         }
-
 class GameStoreGUI(tk.Frame):
     def __init__(self, master=None):
         super().__init__(master)
@@ -51,7 +50,7 @@ class GameStoreGUI(tk.Frame):
 
         # Bind the listbox to a mouse click event to show game details
         self.games_listbox.bind('<<ListboxSelect>>', lambda e: self.show_game_details(games))
-        
+
         self.games_details_frame = tk.Frame(self, bd=1, relief=tk.SUNKEN)
         self.games_details_frame.grid(row=2, column=1, padx=10, pady=10, rowspan=5, sticky="n")
 
@@ -86,6 +85,8 @@ class GameStoreGUI(tk.Frame):
         
         if (selected_game.price == 0):
             selected_game.price = "Free"
+        else:
+            selected_game.price = str(selected_game.price) + " Baht"
 
         # Load the game image from the URL
         game_image = Image.open(requests.get(selected_game.image_url, stream=True).raw)
