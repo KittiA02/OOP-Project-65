@@ -20,10 +20,6 @@ class Game:
             "details": self.details,
             "image_url": self.image_url
         }
-class GamePagination:
-    def __init__(self, items: List[Game], total: int):
-        self.items = items
-        self.total = total
 
 class GameStoreGUI(tk.Frame):
     def __init__(self, master=None):
@@ -87,6 +83,9 @@ class GameStoreGUI(tk.Frame):
 
         selected_game_index = self.games_listbox.curselection()[0]
         selected_game = games[selected_game_index]
+        
+        if (selected_game.price == 0):
+            selected_game.price = "Free"
 
         # Load the game image from the URL
         game_image = Image.open(requests.get(selected_game.image_url, stream=True).raw)
@@ -106,11 +105,9 @@ class GameStoreGUI(tk.Frame):
         game_details = tk.Label(self.games_details_frame, font=name_font, text=selected_game.name)
         game_details.pack(side="top", padx=10, pady=2)
 
-        price_label = tk.Label(self.games_details_frame, font=("Open Sans", 24, "bold"), text="Price:")
+        price_label = tk.Label(self.games_details_frame, font=("Trebuchet MS", 21, "bold"), text=f"Price: {selected_game.price}")
         price_label.pack(side="top", padx=10, pady=0)
 
-        price_value_label = tk.Label(self.games_details_frame, font=("Open Sans", 24), text=selected_game.price)
-        price_value_label.pack(side="top", padx=0, pady=0)
         
         price_label.config(font=("Open Sans", 24))
 
@@ -119,17 +116,21 @@ class GameStoreGUI(tk.Frame):
 
         # Bind the game details to a mouse click event
         self.games_listbox.bind('<<ListboxSelect>>', lambda e: self.show_game_details(games))
+        
 
 
 def fetch_games() -> List[Game]:
     response = requests.get("http://127.0.0.1:8000/games")
     games_data = response.json()
     games = []
-    for game_data in games_data:
-        game = Game(name=game_data["name"], price=game_data["price"], details=game_data["details"], image_url=game_data["image_url"])
-        games.append(game)
+    for product in games_data:
+        name = product['name']
+        price = product['price']
+        details = product['details']
+        image_url = product['image_url']
+        games.append(Game(name, price, details, image_url))
+    games.sort(key=lambda x: x.name)
     return games
-
 
 root.iconbitmap('epic_games_logo_icon_145306.ico')
 
