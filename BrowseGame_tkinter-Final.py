@@ -41,7 +41,7 @@ class GameStoreGUI(tk.Frame):
         # Bind the Return key to the search button
         self.search_entry.bind('<Return>', lambda e: self.search_button.invoke())
 
-        self.games_listbox = tk.Listbox(self, height=20, width=40, font=("Open Sans", 13))
+        self.games_listbox = tk.Listbox(self, height=20, width=40, font=("Open Sans", 15))
         self.games_listbox.grid(row=2, column=0, padx=10, pady=10, rowspan=5)
 
         # Fetch games and insert their names into the listbox
