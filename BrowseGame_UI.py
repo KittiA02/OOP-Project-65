@@ -8,11 +8,16 @@ root.title("Epic Game Store")
 root.iconbitmap("epic_games_logo_icon_145306.ico")
 
 class Game:
-    def __init__(self, title: str, price: float, details: str, image_url: str):
+    def __init__(self, title: str, price: float, details: str, image_url: str, wishlist=None, cart=None):
         self._title = title
         self._price = price
         self._details = details
         self._image_url = image_url
+        self.wishlist = wishlist or []
+        self.cart = cart or []
+        
+    def __str__(self):
+        return f"{self._title} - ${self._price}"
 
     def to_dict(self) -> dict:
         return {
@@ -156,42 +161,83 @@ class Checkout(tk.Button):
         checkout_window.title("Checkout")
         
 class AddWishlist(tk.Button):
-    def __init__(self, master, game):
-            super().__init__(master, text="Add this game to wishlist", font=("Trebuchet MS", 14, "bold"), command=self.add_to_wishlist)
-            self.grid(row=7, column=1, pady=(0, 0))
-            self.game = game
+    def __init__(self, master, game, wishlist=None):
+        super().__init__(master, text="Add this game to wishlist", font=("Trebuchet MS", 14, "bold"), command=self.add_to_wishlist)
+        self.grid(row=7, column=1, pady=(0, 0))
+        self.game = game
+        self.wishlist = wishlist or []
         
     def add_to_wishlist(self):
-        pass
-    
+        self.wishlist.append(self.game)
+
 class AddCart(tk.Button):
-    def __init__(self, master, game):
-            super().__init__(master, text="Add this game to my cart", font=("Trebuchet MS", 14, "bold"), command=self.add_to_cart)
-            self.grid(row=8, column=1, pady=(0, 0))
-            self.game = game
+    def __init__(self, master, game, cart=[]):
+        super().__init__(master, text="Add this game to my cart", font=("Trebuchet MS", 14, "bold"), command=self.add_to_cart)
+        self.grid(row=8, column=1, pady=(0, 0))
+        self.game = game
+        self.cart = cart
         
     def add_to_cart(self):
-        pass
+        self.cart.append(self.game)
     
 class Mywishlist(tk.Button):
-    def __init__(self, master, game):
-            super().__init__(master, text="My Wishlist", font=("Trebuchet MS", 14, "bold"), command=self.my_wishlist)
-            self.grid(row=2, column=2, pady=(0, 0))
-            self.game = game
+    def __init__(self, master, wishlist=None):
+        super().__init__(master, text="My Wishlist", font=("Trebuchet MS", 14, "bold"), command=self.my_wishlist)
+        self.grid(row=2, column=2, pady=(0, 0))
+        self.wishlist = wishlist or []
         
     def my_wishlist(self):
         checkout_window = tk.Toplevel(self)
         checkout_window.title("My Wishlist")
+        
+        # create a frame to hold the listbox and images
+        frame = tk.Frame(checkout_window)
+        frame.grid()
+        
+        # create a listbox to display selected games
+        listbox = tk.Listbox(frame)
+        listbox.grid(row=0, column=0)
+        
+        # add each selected game to the listbox
+        for game in self.wishlist:
+            listbox.insert(tk.END, f"{game['name']} - ${game['price']}")
+            
+            # display the game image
+            image = Image.open(game['image'])
+            photo = ImageTk.PhotoImage(image)
+            label = tk.Label(frame, image=photo)
+            label.image = photo
+            label.grid(row=0, column=1)
     
 class Mycart(tk.Button):
-    def __init__(self, master, game):
-            super().__init__(master, text="My Cart", font=("Trebuchet MS", 14, "bold"), command=self.my_cart)
-            self.grid(row=3, column=2, pady=(0, 0))
-            self.game = game
+    def __init__(self, master, cart=None):
+        super().__init__(master, text="My Cart", font=("Trebuchet MS", 14, "bold"), command=self.my_cart)
+        self.grid(row=3, column=2, pady=(0, 0))
+        self.cart = cart or []
         
     def my_cart(self):
         checkout_window = tk.Toplevel(self)
         checkout_window.title("My Cart")
+        
+        # create a frame to hold the listbox and images
+        frame = tk.Frame(checkout_window)
+        frame.grid()
+        
+        # create a listbox to display selected games
+        listbox = tk.Listbox(frame)
+        listbox.grid(row=0, column=0)
+        
+        # add each selected game to the listbox
+        for game in self.cart:
+            listbox.insert(tk.END, f"{game['name']} - ${game['price']}")
+            
+            # display the game image
+            image = Image.open(game['image'])
+            photo = ImageTk.PhotoImage(image)
+            label = tk.Label(frame, image=photo)
+            label.image = photo
+            label.grid(row=0, column=1)
+
 
 def fetch_games() -> List[Game]:
     response = requests.get("http://127.0.0.1:8000/home")
