@@ -1,10 +1,11 @@
 import datetime
 
 class Game:
-    def __init__(self, title, price, description):
+    def __init__(self, title : str, price : float, details : str,image_url : str):
         self._title = title
         self._price = price
-        self._description = description
+        self._details = details
+        self._image_url = image_url
     @property
     def title(self):
         return self._title
@@ -14,8 +15,12 @@ class Game:
         return self._price
 
     @property
-    def description(self):
-        return self._description
+    def details(self):
+        return self._details
+    
+    @property
+    def image_url(self):
+        return self._image_url
 
 class Catalog:
     def __init__(self):
@@ -32,7 +37,7 @@ class Catalog:
         self._games.remove(game)
 
     def search_games(self, query):
-        results = object()
+        results = {}
         for game in self._games:
             if query in game.title:
                 results = game
@@ -59,6 +64,10 @@ class UserManager:
             self._users.remove(user)
         else:
             raise TypeError("Object is not of type User.")
+    def search_user(self,user_id):
+        for user in self._users:
+            if user.user_info.user_id == user_id:
+                return user
 
 class User:
     def __init__(self, user_info, payment_info, shopping_info):
@@ -395,108 +404,3 @@ class Purchase:
             return f"Paid {total_price} using Creditcard {paypal.paypal_email}"
         else:
             return False
-
-# Game list
-games = [
-    Game("GTA V", 1850, "Open-world action-adventure game."),
-    Game("Minecraft", 790, "Sandbox game where you can build and explore."),
-    Game("Fortnite", 0, "A FREE Battle royale game with cartoon graphics."),
-    Game("Hogwart", 1500, "Single-player Action-adventure game"),
-    Game("Skyrim", 1400, "Single-player Action game"),
-    Game("Destiny", 900, "Multi-player FPS game"),
-    Game("Fall Guys", 500, "A battle royale game"),
-    Game("Among Us", 120, "A multiplayer game where you work together to find the imposter on a spaceship"),
-    Game("Valheim", 280, "A Viking-themed survival game where you explore and build in a procedurally generated world"),
-    Game("Phasmophobia", 350, "A horror game where you and your team investigate haunted locations and try to capture evidence of ghosts"),
-]
-catalog = Catalog()
-
-for game in games:
-    catalog.add_game(game)
-
-usermanage = UserManager()
-authentication = Authentication(usermanage)
-# esc = False
-# while esc == False:
-#     login = input("Login or Sign up (1,2): ")
-#     while login not in ['1','2']:
-#         print('Please enter valid value')
-#         login = input("Login or Sign up (1,2): ")
-#     user = object()
-#     if login == '1':
-#         print('Login')
-#         username = input("Username : ")
-#         password = int(input("Password : "))
-#         user = authentication.login(username, password)
-#         while user == False:
-#             print('Login')
-#             username = input("Username : ")
-#             password = int(input("Password : "))
-#             user = authentication.login(username, password)
-#     else:
-#         print('Sign up')
-#         username = input("Username : ")
-#         password = int(input("Password : "))
-#         email = input("Email : ")
-#         user = authentication.sign_up(username, password, email)
-#         while user == False:
-#             username = input("Username : ")
-#             password = int(input("Password : "))
-#             email = input("Email : ")
-#             user = authentication.sign_up(username, password, email)
-#         user = usermanage.users[-1]
-#     shopping = True
-#     while shopping == True:
-#         select = input("Game/Cart/Wishlist (1,2,3): ")
-#         while select not in ['1','2','3']:
-#             print('Please enter valid value')
-#             select = input("Game/Cart/Wishlist (1,2,3): ")
-#         if select == '1':
-#             for order,gm in enumerate(catalog.games):
-#                 print(f'{order}: {gm.title} / {gm.price} bath / {gm.description}')
-#             addwish = input('Which game do you want to add to wishlist? :').split(',')
-#             print(addwish)
-#             for gm in addwish:
-#                 game = catalog.search_games(gm)
-#                 user.shopping_info.user_wishlist.add_item(game)
-#             addcart = input("Which game do you want to add to cart? : ").split(',')
-#             print(addcart)
-#             for gm in addcart:
-#                 game = catalog.search_games(gm)
-#                 user.shopping_info.user_cart.add_item(game)
-#             print(user.shopping_info.user_cart.items)
-#             print(user.shopping_info.user_wishlist.items)
-
-
-# user1_info = UserInfo('sunpolll',12345,'64011201@kmitl.ac.th',1)
-# payment1 = PaymentInfo(1)
-# shopping1 = ShoppingInfo(1,PurchaseHistory(1),UserWishlist(1),ShoppingCart(1))
-# user1 = User(user1_info,payment1,shopping1)
-# credit1 = CreditCard('card1',12345,'11/24',352)
-# paypal1 = Paypal('64011201@kmitl.ac.th',12345)
-# user1.payment_info.add_credit_card(credit1)
-# user1.payment_info.add_paypal(paypal1)
-# for game in catalog.games:
-#     print(game.title)
-# print(catalog.search_games('GTA V').title)
-# game = catalog.search_games('GTA V')
-# game1 = catalog.search_games('Minecraft')
-# print(game)
-# shopping1.user_cart.add_item(game)
-# print(shopping1.user_cart.items)
-# shopping1.user_cart.single_item = game
-# print(shopping1.user_cart.single_item)
-# purchase = Purchase(user1)
-# paid1 = purchase.cart_purchase_CC(CreditCard('card10',12345,'11/24',352),True)
-# print(paid1)
-# paid2 = purchase.cart_purchase_PP(Paypal('64011201@kmitl.ac.th',352),True)
-# print(paid2)
-# paid3 = purchase.one_purchase_CC(CreditCard('card4',12345,'11/24',352),True)
-# print(paid3)
-# shopping1.user_cart.single_item = game1
-# paid4 = purchase.one_purchase_PP(Paypal('64011241@kmitl.ac.th',352),True)
-# print(paid4)
-# for gm in user1.shopping_info.purchase_history.purchases:
-#     print(gm.title, gm.price , gm.date, gm.payment_type, gm.payment_info)
-# print(user1.payment_info.credit_card)
-# print(user1.payment_info.paypal)

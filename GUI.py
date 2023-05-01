@@ -12,16 +12,23 @@ def fetch_games():
         return []
 
 def search_game():
-    search_query = {game : game_search_var.get()}
-    response = requests.post(API_URL + "/search_game", json=search_query)
-    if response.status_code == 200:
-        result = response.json()
-        if "error" not in result:
-            result_label.config(text=f"Title: {result['title']}\nPrice: {result['price']}\nDescription: {result['description']}")
-        else:
-            result_label.config(text=result["error"])
+    query = game_search_var.get()
+    if query:
+        try:
+            response = requests.post(API_URL + "/search_game", json={"query": query})
+            print(f"Response status code: {response.status_code}")
+            print(f"Response content: {response.content}")
+            if response.status_code == 200:
+                result = response.json()
+                result_label.config(text=f"Title: {result['_title']}\nPrice: {result['_price']}\nDescription: {result['_description']}")
+            else:
+                result_label.config(text="Error fetching game")
+        except Exception as e:
+            print(f"Exception occurred: {e}")
+            result_label.config(text="Error fetching game")
     else:
-        result_label.config(text="Error fetching game data")
+        result_label.config(text="Please enter a game title")
+
 
 # Create the main window
 root = tk.Tk()
