@@ -2,4 +2,27 @@
 for OOP project
 
 
-**TEST**
+**Fight for not F'ed on OOP**
+
+
+.
+.
+.
+
+
+
+
+
+
+.
+.
+..
+
+
+
+
+
+.
+.
+
+(Bc we suffer it)
