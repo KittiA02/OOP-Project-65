@@ -8,24 +8,24 @@ root.title("Epic Game Store")
 root.iconbitmap("epic_games_logo_icon_145306.ico")
 
 class Game:
-    def __init__(self, name: str, price: float, details: str, image_url: str):
-        self.name = name
-        self.price = price
-        self.details = details
-        self.image_url = image_url
+    def __init__(self, title: str, price: float, details: str, image_url: str):
+        self._title = title
+        self._price = price
+        self._details = details
+        self._image_url = image_url
 
     def to_dict(self) -> dict:
         return {
-            "name": self.name,
-            "price": self.price,
-            "details": self.details,
-            "image_url": self.image_url
+            "title": self._title,
+            "price": self._price,
+            "details": self._details,
+            "image_url": self._image_url
         }
 
 class GameStoreGUI(tk.Frame, tk.Tk):
     def __init__(self, master=None):
         super().__init__(master)
-        self.master.geometry("1458x820")
+        self.master.geometry("1280x760")
         self.master = master
         self.pack(padx=0, pady=0, expand=True, fill='both')
         self.create_widgets()
@@ -46,10 +46,10 @@ class GameStoreGUI(tk.Frame, tk.Tk):
         self.search_label.grid(row=2, column=0, pady=(5, 2))
         
         self.checkout_button = tk.Button(self, text="Buy Now!", command=self.checkout, font=("Trebuchet MS", 14, "bold"))
-        self.checkout_button.grid(row=7, column=1, padx=(10, 20), pady=(5, 10))
+        self.checkout_button.grid(row=6, column=1, pady=(0, 0))
         
         self.cart_button = tk.Button(self, text="Add this game to my cart", command=self.add_to_cart, font=("Trebuchet MS", 14, "bold"))
-        self.cart_button.grid(row=8, column=1, padx=(10, 20), pady=(5, 10))
+        self.cart_button.grid(row=7, column=1, pady=(0,0))
 
         # Bind the Return key to the search button
         self.search_entry.bind('<Return>', lambda e: self.search_button.invoke())
@@ -75,14 +75,14 @@ class GameStoreGUI(tk.Frame, tk.Tk):
         # Fetch games and insert their names into the listbox
         games = fetch_games()
         for game in games:
-            self.games_listbox.insert(tk.END, game.name)
+            self.games_listbox.insert(tk.END, game._title)
 
         # Bind the listbox to a mouse click event to show game details
         self.games_listbox.bind('<<ListboxSelect>>', lambda e: self.show_game_details(games))
         
         self.games_details_frame = tk.Frame(self, bd=1, relief=tk.SUNKEN, highlightthickness=0)
         self.games_details_frame.configure(bg="#34495E")
-        self.games_details_frame.grid(row=2, column=1, columnspan=2, padx=10, pady=10, rowspan=5, sticky="n")
+        self.games_details_frame.grid(row=2, column=1, padx=10, pady=2, rowspan=3, columnspan=1, sticky="n")
 
         self.game_details_canvas = tk.Canvas(self.games_details_frame, bd=0, highlightthickness=0)
         self.game_details_canvas.configure(bg="#34495E")
@@ -96,9 +96,9 @@ class GameStoreGUI(tk.Frame, tk.Tk):
         self.games_listbox.delete(0, tk.END)
         games = fetch_games()
         search_query = self.search_entry.get().lower()
-        matching_games = [game for game in games if search_query in game.name.lower()]
+        matching_games = [game for game in games if search_query in game._title.lower()]
         for game in matching_games:
-            self.games_listbox.insert(tk.END, game.name)
+            self.games_listbox.insert(tk.END, game._title)
         self.games_listbox.bind('<<ListboxSelect>>', lambda e: self.show_game_details(matching_games))
 
 
@@ -110,11 +110,11 @@ class GameStoreGUI(tk.Frame, tk.Tk):
         selected_game_index = self.games_listbox.curselection()[0]
         selected_game = games[selected_game_index]
         
-        if (selected_game.price == 0):
-            selected_game.price = "Free"
+        if (selected_game._price == 0):
+            selected_game._price = "Free"
 
         # Load the game image from the URL
-        game_image = Image.open(requests.get(selected_game.image_url, stream=True).raw)
+        game_image = Image.open(requests.get(selected_game._image_url, stream=True).raw)
         game_image = game_image.resize((480, 270), Image.ANTIALIAS)
         game_image = ImageTk.PhotoImage(game_image)
 
@@ -123,18 +123,18 @@ class GameStoreGUI(tk.Frame, tk.Tk):
         image_label.image = game_image
         image_label.pack(side="top", padx=10, pady=10)
 
-        # Set the font size and style for game name, price, and details
+        # Set the font size and style for game title, price, and details
         name_font = ("Trebuchet MS", 32, "bold")
         details_font = ("Open Sans", 14)
 
         # Use a label widget to display the game details
-        game_details = tk.Label(self.games_details_frame, font=name_font, text=selected_game.name, fg="#F0B27A", bg="#34495E")
+        game_details = tk.Label(self.games_details_frame, font=name_font, text=selected_game._title, fg="#F0B27A", bg="#34495E")
         game_details.pack(side="top", padx=10, pady=2)
 
-        price_label = tk.Label(self.games_details_frame, font=("Trebuchet MS", 21, "bold"), text=f"Price: {selected_game.price}", fg="#F0B27A", bg="#34495E")
+        price_label = tk.Label(self.games_details_frame, font=("Trebuchet MS", 21, "bold"), text=f"Price: {selected_game._price}", fg="#F0B27A", bg="#34495E")
         price_label.pack(side="top", padx=10, pady=0)
 
-        details_label = tk.Label(self.games_details_frame, font=details_font, text=selected_game.details, wraplength=500, fg="#F0B27A", bg="#34495E")
+        details_label = tk.Label(self.games_details_frame, font=details_font, text=selected_game._details, wraplength=500, fg="#F0B27A", bg="#34495E")
         details_label.pack(side="top", padx=10, pady=3)
 
         # Bind the game details to a mouse click event
@@ -148,16 +148,16 @@ class GameStoreGUI(tk.Frame, tk.Tk):
         
 
 def fetch_games() -> List[Game]:
-    response = requests.get("http://127.0.0.1:8000/games")
+    response = requests.get("http://127.0.0.1:8000/home")
     games_data = response.json()
     games = []
     for product in games_data:
-        name = product['name']
+        title = product['title']
         price = product['price']
         details = product['details']
         image_url = product['image_url']
-        games.append(Game(name, price, details, image_url))
-    games.sort(key=lambda x: x.name)
+        games.append(Game(title, price, details, image_url))
+    games.sort(key=lambda x: x._title)
     return games
 
 root.iconbitmap('epic_games_logo_icon_145306.ico')

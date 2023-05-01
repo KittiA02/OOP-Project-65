@@ -5,18 +5,18 @@ import uvicorn
 app = FastAPI()
 
 class Game:
-    def __init__(self, name: str, price: float, details: str, image_url: str):
-        self.name = name
-        self.price = price
-        self.details = details
-        self.image_url = image_url
+    def __init__(self, title: str, price: float, details: str, image_url: str):
+        self._title = title
+        self._price = price
+        self._details = details
+        self._image_url = image_url
 
     def to_dict(self) -> dict:
         return {
-            "name": self.name,
-            "price": self.price,
-            "details": self.details,
-            "image_url": self.image_url
+            "title": self._title,
+            "price": self._price,
+            "details": self._details,
+            "image_url": self._image_url
         }
 
 class Games:
@@ -32,18 +32,18 @@ game_lists = [
         Game("Minecraft", 790, "Sandbox game where you can build and explore as you like.", "https://image.api.playstation.com/vulcan/img/cfn/11307uYG0CXzRuA9aryByTHYrQLFz-HVQ3VVl7aAysxK15HMpqjkAIcC_R5vdfZt52hAXQNHoYhSuoSq_46_MT_tDBcLu49I.png"),
         Game("Fortnite", 0, "A Battle royale game with cartoon graphics.", "https://cdn1.epicgames.com/offer/fn/24BR_S24_EGS_Launcher_Blade_2560x1440_2560x1440-437d0424d02f5fd286ab659ddade30db"),
         Game("Hogwarts Legacy", 1500, "Single-player Action-adventure game", "https://cdn1.epicgames.com/offer/e97659b501af4e3981d5430dad170911/EGS_HogwartsLegacy_AvalancheSoftware_S1_2560x1440-2baf3188eb3c1aa248bcc1af6a927b7e"),
-        Game("The Elder Scrolls V: Skyrim", 1400, "Single-player Action game", "https://cdn1.epicgames.com/offer/c8738a4d1ead40368eab9688b3c7d737/EGS_TheElderScrollsVSkyrimAnniversaryEdition_BethesdaGameStudios_Editions_S1_2560x1440-accc22362e1ae7bf4c1fe215f357c5a6"),
+        Game("The Elder Scrolls V:\n Skyrim", 1400, "Single-player Action game", "https://cdn1.epicgames.com/offer/c8738a4d1ead40368eab9688b3c7d737/EGS_TheElderScrollsVSkyrimAnniversaryEdition_BethesdaGameStudios_Editions_S1_2560x1440-accc22362e1ae7bf4c1fe215f357c5a6"),
         Game("Fall Guys", 500, "A cartoon-like character battle royale game", "https://cdn1.epicgames.com/offer/50118b7f954e450f8823df1614b24e80/EGS_FallGuys_Mediatonic_S1_2560x1440-187aa50ffaa014885d6702a0b632f848"),
         Game("Among Us", 120, "A multiplayer game where you work together to find the imposter on a spaceship", "https://cdn1.epicgames.com/salesEvent/salesEvent/amoguslandscape_2560x1440-3fac17e8bb45d81ec9b2c24655758075"),
         Game("Phasmophobia", 350, "A horror game where you and your team\n investigate haunted locations\n and try to capture evidence of ghosts", "https://cdn.cloudflare.steamstatic.com/steam/apps/739630/capsule_616x353.jpg?t=1674232976"),
-        Game("The Legend of Zelda: Breath of the Wild", 2000, "Action-adventure game in an open world environment from Nintendo platform.", "https://assets.nintendo.com/image/upload/v1681238674/Microsites/zelda-tears-of-the-kingdom/videos/posters/totk_microsite_officialtrailer3_1304xj47am"),
+        Game("The Legend of Zelda:\n Breath of the Wild", 2000, "Action-adventure game in an open world environment from Nintendo platform.", "https://assets.nintendo.com/image/upload/v1681238674/Microsites/zelda-tears-of-the-kingdom/videos/posters/totk_microsite_officialtrailer3_1304xj47am"),
         Game("Overwatch", 990, "Multiplayer role-playing first-person shooter game", "https://upload.wikimedia.org/wikipedia/en/thumb/5/51/Overwatch_cover_art.jpg/220px-Overwatch_cover_art.jpg"),
         Game("Portal 2", 100, "First-person puzzle-platform game that can done in multi-player mode.", "https://cdn.akamai.steamstatic.com/steam/apps/620/header.jpg"),
         Game("Red Dead Redemption 2", 2200, "Action-adventure game in an open world environment.", "https://cdn1.epicgames.com/b30b6d1b4dfd4dcc93b5490be5e094e5/offer/RDR2476298253_Epic_Games_Wishlist_RDR2_2560x1440_V01-2560x1440-2a9ebe1f7ee202102555be202d5632ec.jpg"),
         Game("The Witcher 3: Wild Hunt", 1290, "Action role-playing game with an open world environment", "https://cdn1.epicgames.com/offer/14ee004dadc142faaaece5a6270fb628/EGS_TheWitcher3WildHuntCompleteEdition_CDPROJEKTRED_S1_2560x1440-82eb5cf8f725e329d3194920c0c0b64f"),
         Game("Assassin's Creed Valhalla", 1700, "Action role-playing game with an open world environment", "https://cdn1.epicgames.com/salesEvent/salesEvent/UK_ACV_DELUXE%20_EPIC_Store%20Landscape_2560x1440%20_2560x1440-0585cdaf65bee5ffce91881220ade66b"),
         Game("Call of Duty: Warzone", 0, "A FREE first-person shooter battle royale game with 150 players.", "https://www.callofduty.com/content/dam/atvi/callofduty/cod-touchui/blog/hero/mw-wz/WZ-Season-Three-Announce-TOUT.jpg"),
-        Game("Counter-Strike: Global Offensive", 0, "A FREE multiplayer first-person shooter game.", "https://cdn.cloudflare.steamstatic.com/steam/apps/730/capsule_616x353.jpg?t=1668125812"),
+        Game("Counter-Strike:\n Global Offensive", 0, "A FREE multiplayer first-person shooter game.", "https://cdn.cloudflare.steamstatic.com/steam/apps/730/capsule_616x353.jpg?t=1668125812"),
         Game("Starcraft II", 1190, "A sci-fi real-time strategy game.", "https://s.isanook.com/ga/0/rp/r/w850/ya0xa0m1w0/aHR0cHM6Ly9zLmlzYW5vb2suY29tL2dhLzAvdWQvMjE1LzEwNzc5NDcvc3RhcmNyYWZ0aWkoMSkuanBn.jpg"),    
         Game("Fallout 4", 450, "Open-world post-apocalyptic action role-playing game.", "https://image.api.playstation.com/vulcan/ap/rnd/202009/2500/4GZyUQ1bHTjICP6GCRG7f65n.png"),
         Game("World of Warcraft", 1590, "An online multiplayer RPG set in the Warcraft universe.", "https://cdn.wccftech.com/wp-content/uploads/2016/10/world-of-warcraft-vanilla-legacy.jpg"),    
@@ -68,7 +68,7 @@ game_lists = [
 games = Games(game_lists)
 
 # FastAPI route handlers
-@app.get("/games")
+@app.get("/home")
 async def show_game_info():
     return games.get_game_info()
 
