@@ -46,12 +46,8 @@ class GameStoreGUI(tk.Frame):
         self.search_label = tk.Label(self, text="Browse:", font=("Trebuchet MS", 20), fg="#ABEBC6", bg="#34495E")
         self.search_label.grid(row=2, column=0, pady=(5, 2))
         
-        
-        self.cart_button = tk.Button(self, text="My cart", command=self.my_cart, font=("Trebuchet MS", 14, "bold"))
-        self.cart_button.grid(row=2, column=2, pady=(0,0))
-        
-        self.wishlist_button = tk.Button(self, text="My wishlist", command=self.my_wishlist, font=("Trebuchet MS", 14, "bold"))
-        self.wishlist_button.grid(row=3, column=2, pady=(0,0))
+        wishlist_button = Mywishlist(self, self.game)
+        cart_button = Mycart(self, self.game)
 
         # Bind the Return key to the search button
         self.search_entry.bind('<Return>', lambda e: self.search_button.invoke())
@@ -148,12 +144,6 @@ class GameStoreGUI(tk.Frame):
 
         # Bind the game details to a mouse click event
         self.games_listbox.bind('<<ListboxSelect>>', lambda e: self.show_game_details(games))
-    
-    def my_wishlist(self):
-        pass
-    
-    def my_cart(self):
-        pass 
         
 class Checkout(tk.Button):
     def __init__(self, master, game):
@@ -182,6 +172,26 @@ class AddCart(tk.Button):
         
     def add_to_cart(self):
         pass
+    
+class Mywishlist(tk.Button):
+    def __init__(self, master, game):
+            super().__init__(master, text="My Wishlist", font=("Trebuchet MS", 14, "bold"), command=self.my_wishlist)
+            self.grid(row=2, column=2, pady=(0, 0))
+            self.game = game
+        
+    def my_wishlist(self):
+        checkout_window = tk.Toplevel(self)
+        checkout_window.title("My Wishlist")
+    
+class Mycart(tk.Button):
+    def __init__(self, master, game):
+            super().__init__(master, text="My Cart", font=("Trebuchet MS", 14, "bold"), command=self.my_cart)
+            self.grid(row=3, column=2, pady=(0, 0))
+            self.game = game
+        
+    def my_cart(self):
+        checkout_window = tk.Toplevel(self)
+        checkout_window.title("My Cart")
 
 def fetch_games() -> List[Game]:
     response = requests.get("http://127.0.0.1:8000/home")
