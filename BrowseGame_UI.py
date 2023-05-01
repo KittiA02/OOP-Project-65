@@ -15,9 +15,6 @@ class Game:
         self._image_url = image_url
         self.wishlist = wishlist or []
         self.cart = cart or []
-        
-    def __str__(self):
-        return f"{self._title} - ${self._price}"
 
     def to_dict(self) -> dict:
         return {
@@ -51,6 +48,7 @@ class GameStoreGUI(tk.Frame):
         self.search_label = tk.Label(self, text="Browse:", font=("Trebuchet MS", 20), fg="#ABEBC6", bg="#34495E")
         self.search_label.grid(row=2, column=0, pady=(5, 2))
         
+        # declare the usege of the buttons
         wishlist_button = Mywishlist(self, self.game)
         cart_button = Mycart(self, self.game)
 
@@ -161,7 +159,7 @@ class Checkout(tk.Button):
         checkout_window.title("Checkout")
         
 class AddWishlist(tk.Button):
-    def __init__(self, master, game, wishlist=None):
+    def __init__(self, master, game, wishlist=[]):
         super().__init__(master, text="Add this game to wishlist", font=("Trebuchet MS", 14, "bold"), command=self.add_to_wishlist)
         self.grid(row=7, column=1, pady=(0, 0))
         self.game = game
@@ -175,13 +173,13 @@ class AddCart(tk.Button):
         super().__init__(master, text="Add this game to my cart", font=("Trebuchet MS", 14, "bold"), command=self.add_to_cart)
         self.grid(row=8, column=1, pady=(0, 0))
         self.game = game
-        self.cart = cart
+        self.cart = cart or []
         
     def add_to_cart(self):
         self.cart.append(self.game)
     
 class Mywishlist(tk.Button):
-    def __init__(self, master, wishlist=None):
+    def __init__(self, master, wishlist):
         super().__init__(master, text="My Wishlist", font=("Trebuchet MS", 14, "bold"), command=self.my_wishlist)
         self.grid(row=2, column=2, pady=(0, 0))
         self.wishlist = wishlist or []
@@ -210,7 +208,7 @@ class Mywishlist(tk.Button):
             label.grid(row=0, column=1)
     
 class Mycart(tk.Button):
-    def __init__(self, master, cart=None):
+    def __init__(self, master, cart):
         super().__init__(master, text="My Cart", font=("Trebuchet MS", 14, "bold"), command=self.my_cart)
         self.grid(row=3, column=2, pady=(0, 0))
         self.cart = cart or []
