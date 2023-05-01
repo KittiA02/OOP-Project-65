@@ -25,7 +25,7 @@ class Game:
 class GameStoreGUI(tk.Frame, tk.Tk):
     def __init__(self, master=None):
         super().__init__(master)
-        self.master.geometry("1280x760")
+        self.master.geometry("1400x850")
         self.master = master
         self.pack(padx=0, pady=0, expand=True, fill='both')
         self.create_widgets()
@@ -45,11 +45,20 @@ class GameStoreGUI(tk.Frame, tk.Tk):
         self.search_label = tk.Label(self, text="Browse:", font=("Trebuchet MS", 20), fg="#ABEBC6", bg="#34495E")
         self.search_label.grid(row=2, column=0, pady=(5, 2))
         
-        self.checkout_button = tk.Button(self, text="Buy Now!", command=self.checkout, font=("Trebuchet MS", 14, "bold"))
+        self.checkout_button = tk.Button(self, text="Buy this game", command=self.checkout, font=("Trebuchet MS", 14, "bold"))
         self.checkout_button.grid(row=6, column=1, pady=(0, 0))
         
         self.cart_button = tk.Button(self, text="Add this game to my cart", command=self.add_to_cart, font=("Trebuchet MS", 14, "bold"))
         self.cart_button.grid(row=7, column=1, pady=(0,0))
+        
+        self.cart_button = tk.Button(self, text="Add this game to my wishlist", command=self.add_to_wishlist, font=("Trebuchet MS", 14, "bold"))
+        self.cart_button.grid(row=8, column=1, pady=(0,0))
+        
+        self.cart_button = tk.Button(self, text="My cart", command=self.my_cart, font=("Trebuchet MS", 14, "bold"))
+        self.cart_button.grid(row=2, column=2, pady=(0,0))
+        
+        self.cart_button = tk.Button(self, text="My wishlist", command=self.my_wishlist, font=("Trebuchet MS", 14, "bold"))
+        self.cart_button.grid(row=3, column=2, pady=(0,0))
 
         # Bind the Return key to the search button
         self.search_entry.bind('<Return>', lambda e: self.search_button.invoke())
@@ -145,6 +154,15 @@ class GameStoreGUI(tk.Frame, tk.Tk):
         
     def checkout(self):
         pass
+    
+    def add_to_wishlist(self):
+        pass
+    
+    def my_wishlist(self):
+        pass
+    
+    def my_cart(self):
+        pass    
         
 
 def fetch_games() -> List[Game]:
