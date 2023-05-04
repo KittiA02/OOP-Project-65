@@ -2,7 +2,6 @@ import tkinter as tk
 from tkinter import *
 from PIL import ImageTk, Image
 import requests
-from backendclass import *
 import math
 from tkvideo import tkvideo
 
