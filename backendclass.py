@@ -107,7 +107,7 @@ class Authentication:
         # Add the new user to the list of users
         self._manager.add(new_user)
         print(f"User {username} has been successfully registered.")
-        return True
+        return new_user
 
     def login(self, username, password):
         for user in self._manager.users:
@@ -174,14 +174,14 @@ class PaymentInfo:
     def add_credit_card(self, credit_card):
         self._credit_card[credit_card.name] = credit_card
 
-    def remove_credit_card(self, credit_card):
-        del self._credit_card[credit_card.name]
+    def remove_credit_card(self, card_name):
+        del self._credit_card[card_name]
     
     def add_paypal(self, paypal):
         self._paypal[paypal.paypal_email] = paypal
     
-    def remove_paypal(self, paypal):
-        del self._paypal[paypal.paypal_email]
+    def remove_paypal(self, paypal_email):
+        del self._paypal[paypal_email]
 
 class CreditCard:
     def __init__(self, name, card_number, expiration_date, cvv):
@@ -270,7 +270,6 @@ class ShoppingCart:
     def __init__(self, user_id):
         self._user_id = user_id
         self._items = {}
-        self._single_item = {}
 
     @property
     def user_id(self):
@@ -280,6 +279,8 @@ class ShoppingCart:
     def items(self):
         return self._items
     @items.setter
+    def items(self, value):
+        self._items  = value
     def clear_items(self):
         self._items = {}
     def add_item(self, game):
@@ -294,29 +295,23 @@ class ShoppingCart:
             total_price += item.price
         return total_price
     
-    @property
-    def single_item(self):
-        return self._single_item
-    @single_item.setter
-    def single_item(self, value):
-        self._single_item = value
 
 
 class PurchaseHistory:
     def __init__(self, user_id):
         self._user_id = user_id
-        self._purchases = []
+        self._purchased = []
 
     @property
     def user_id(self):
         return self._user_id
 
     @property
-    def purchases(self):
-        return self._purchases
+    def purchased(self):
+        return self._purchased
 
     def add_purchase(self, purchase):
-        self._purchases.append(purchase)
+        self._purchased.append(purchase)
 class Purchase_info:
     def __init__(self,game_title,price,date,payment_type,payment_info):
         self._game_title = game_title
@@ -362,16 +357,14 @@ class Purchase:
             return f"Paid {total_price} using Creditcard {credit_card.card_number}"
         else:
             return False
-    def one_purchase_CC(self,credit_card, save):
+    def one_purchase_CC(self,game,credit_card, save):
         #save new credit card
         if save == True and credit_card.name not in self._user.payment_info.credit_card:    
             self._user.payment_info.add_credit_card(credit_card)
-        if self._user.shopping_info.user_cart.single_item != {}:
+        if game != {}:
         #if purchase process is successful
-            game = self._user.shopping_info.user_cart.single_item
             self._user.shopping_info.purchase_history.add_purchase(Purchase_info(game.title,game.price,datetime.datetime.now(),'Credit Card',credit_card.card_number))
             total_price = game.price
-            self._user.shopping_info.user_cart.single_item = {}
             return f"Paid {total_price} using Creditcard {credit_card.card_number}"
         else:
             return False
@@ -390,17 +383,14 @@ class Purchase:
         else:
             return False
 
-    def one_purchase_PP(self,paypal, save):
+    def one_purchase_PP(self,game,paypal, save):
         #save new paypal payment
         if save == True and paypal.paypal_email not in self._user.payment_info.paypal:    
             self._user.payment_info.add_paypal(paypal)
-        if self._user.shopping_info.user_cart.single_item != {}:
+        if game != {}:
             #if purchase process is successful
-            game = self._user.shopping_info.user_cart.single_item
-            print(game)
             self._user.shopping_info.purchase_history.add_purchase(Purchase_info(game.title,game.price,datetime.datetime.now(),'Paypal',paypal.paypal_email))
             total_price = game.price
-            self._user.shopping_info.user_cart.single_item = {}
             return f"Paid {total_price} using Creditcard {paypal.paypal_email}"
         else:
             return False
