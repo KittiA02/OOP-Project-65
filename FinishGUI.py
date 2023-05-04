@@ -392,7 +392,7 @@ class HomePage(tk.Frame):
         self.store_name.pack(side="left", padx=10, pady=10)
         self.store_name.bind("<Button-1>",lambda e: self.back_to_homepage())
         self.search_entry = tk.Entry(
-            self.top_bar, width=60, font=("Trebuchet MS", 14), bg="white"
+            self.top_bar, width=60, font=("Trebuchet MS", 14), bg="white",fg='black'
         )
         self.search_entry.bind("<KeyRelease>", self.delayed_on_entry_change)
         self.search_entry.pack(
@@ -1251,9 +1251,19 @@ class HomePage(tk.Frame):
         self.cc_request(user_id, name, card_number, expiration,cvv,save,game_title)
 
     def cc_request(self, user_id, name, card_number, expiration, cvv, save,game_title):
+        query = {
+            'user_id': user_id,
+            'name': name,
+            'card_number': card_number,
+            'expiration': expiration,
+            'cvv': cvv,
+            'save' : save,
+            'game_title' : game_title
+        }
+
         response = requests.post(
             API_URL
-            + f"/payment/creditcard/{user_id}/{name}/{card_number}/{expiration}/{cvv}/{save}/{game_title}"
+            + f"/payment/creditcard/{user_id}" , json = query
         )
         if response.status_code == 200:
             result = response.json()
@@ -1268,7 +1278,7 @@ class HomePage(tk.Frame):
             widget.destroy()
         email_label = tk.Label(
             self.collect_info_frame,
-            text="Full Name:",
+            text="Email:",
             font=("Times New Roman", 20, "bold"),
             bg = 'white',fg='black'
         )
@@ -1277,7 +1287,7 @@ class HomePage(tk.Frame):
         )
         psw_label = tk.Label(
             self.collect_info_frame,
-            text="Card Number:",
+            text="Password:",
             font=("Times New Roman", 20, "bold"),
             bg = 'white',fg='black'
         )
@@ -1320,9 +1330,16 @@ class HomePage(tk.Frame):
         self.paypal_request(user_id, email, password,save, game_title)
 
     def paypal_request(self,user_id,email,password,save,game_title):
+        query = {
+            'user_id': user_id,
+            'email': email,
+            'password': password,
+            'save': save,
+            'game_title': game_title
+        }
         response = requests.post(
             API_URL
-            + f"/payment/paypal/{user_id}/{email}/{password}/{save}/{game_title}"
+            + f"/payment/paypal/{user_id}" , json = query
         )
         if response.status_code == 200:
             result = response.json()
