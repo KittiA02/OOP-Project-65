@@ -190,8 +190,15 @@ async def remove_from_wishlist(user_id : int, game_title : str):
     user.shopping_info.user_wishlist.remove_item(catalog.search_games(game_title))
     return f"{game_title} removed from wishlist"
 
-@app.post("/payment/creditcard/{user_id}/{name}/{card_number}/{expiration}/{cvv}/{save}/{game_title}",tags= ["Pay with credit card"])
-async def pay_cc(user_id : int, name : str, card_number : int, expiration : str, cvv : int,save : bool,game_title : str):
+@app.post("/payment/creditcard/{user_id}",tags= ["Pay with credit card"])
+async def pay_cc(data : dict):
+    user_id = data['user_id']
+    name = data['name']
+    card_number = data['card_number']
+    expiration = data['expiration']
+    cvv = data['cvv']
+    save = data['save']
+    game_title = data['game_title']
     current_user = usermanage.search_user(user_id)
     current_card = CreditCard(name,card_number,expiration,cvv)
     current_purchase = Purchase(current_user)
@@ -204,8 +211,14 @@ async def pay_cc(user_id : int, name : str, card_number : int, expiration : str,
     return f'Your Purchase is successfully'
     
 
-@app.post("/payment/paypal/{user_id}/{email}/{password}/{save}/{game_title}",tags= ["Pay with Paypal"])
-async def pay_cc(user_id : int, email : str, password : int,save : bool,game_title : str):
+@app.post("/payment/paypal/{user_id}",tags= ["Pay with Paypal"])
+async def pay_cc(data : dict):
+    user_id = data['user_id']
+    email = data['email']
+    password = data['password']
+    save = data['save']
+    game_title = data['game_title']
+
     current_user = usermanage.search_user(user_id)
     current_pp = Paypal(email,password)
     current_purchase = Purchase(current_user)
