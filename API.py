@@ -1,8 +1,9 @@
 from fastapi import FastAPI
 import uvicorn
 from pydantic import BaseModel
-from test_demo import *
+from backendclass import *
 app = FastAPI()
+
 
 
 # Game list
@@ -58,173 +59,175 @@ system_users = [
     authentication.sign_up('Pooh',123,'nongpooh@gmail.com')
 ]
 
-for user in usermanage.users:
-    print(user.user_info.username,user.user_info.email,user.user_info.user_id)
+user = usermanage.search_user(2)
+cc1 = CreditCard('Pollawat Prechathaamruch',123456789,'11.24',352)
+pp1 = Paypal('64011201@kmitl.ac.th',12345)
+user.payment_info.add_credit_card(cc1)
+user.payment_info.add_paypal(pp1)
+pay = Purchase(user)
+pay.one_purchase_CC(catalog.search_games('Minecraft'),cc1,False)
 
-class CurrentUser():
-    def __init__(self, user):
-        self._user = user
-
-    @property
-    def user(self):
-        return self._user
-    @user.setter
-    def user(self, value):
-        self._user = value
-current_user = CurrentUser(object())
-
-
-
-#Authentication 
-#sign up
+#Authentication
 @app.post("/sign_up", tags=["Authentication"])
-async def sign_up(username: str, password: int, email: str):
-    return authentication.sign_up(username, password, email)
-#login
+async def sign_up(data : dict):
+    username = data.get("username")
+    password = data.get("password")
+    email = data.get("email")
+    signup = authentication.sign_up(username, password, email)
+    if signup != False: return signup.user_info.user_id
+    else : return False
+
 @app.post("/login", tags=["Authentication"])
-async def login(username: str, password: int):
-    if authentication.login(username, password) != False:
-        current_user.user = (authentication.login(username, password))
-        return True
+async def login(data: dict):
+    username = data.get("username")
+    password = data.get("password")
+    logged_in = authentication.login(username, password)
+    if logged_in != False:
+        return logged_in.user_info.user_id
+    else:
+        return False
 
 
-
-#Homepage
-#get all games
+#Game
 @app.get("/", tags=["Homepage"])
 async def get_all_games():
-    games_list = []
-    for game in catalog.games:
-        games_list.append(game)
+    games_list = catalog.games
     return games_list
 
-#Games
-#search game
-@app.get("/game/{game_title}", tags=["Games"])
-async def get_game(game_title: str):
-    game = catalog.search_games(game_title)
-    if game:
-        return game
-    else:
-        return {"error": "Game not found"}
-
-
-
 #Users
-#get users
-@app.get("/users", tags=["Users"])
-async def get_users():
-    users_list = []
-    for user in usermanage.users:
-        users_list.append(user)
-    return users_list
-#get user by id
-@app.get("/user/{user_id}", tags=["Users"])
-async def get_user(user_id: int):
-    for user in usermanage.users:
-        if user.user_info.user_id == user_id:
-            return {"user_id": user.user_info.user_id, "username": user.user_info.username}
-    return {"error": "User not found"}
+@app.get("/user/user_info/{user_id}", tags=["User Info"])
+async def get_user(user_id : int):
+    user = usermanage.search_user(user_id)
+    return user.user_info
 
+@app.get("/user/payment_info/{user_id}", tags=["Payment Info"])
+async def get_user(user_id : int):
+    user = usermanage.search_user(user_id)
+    return user.payment_info
+@app.get("/user/shopping_info/{user_id}", tags=["Shopping Info"])
+async def get_user(user_id : int):
+    user = usermanage.search_user(user_id)
+    return user.shopping_info.purchase_history.purchased
+@app.post("/user/add_credit_card/{user_id}", tags=["User Info"])
+async def get_user(data : dict):
+    user = usermanage.search_user(data["user_id"])
+    name = data['name']
+    card_number = data['card_number']
+    exp = data['exp']
+    cvv = data['cvv']
+    user.payment_info.add_credit_card(CreditCard(name, card_number, exp, cvv))
+    return user.payment_info
 
+@app.delete("/user/remove_credit_card/{user_id}", tags=["User Info"])
+async def get_user(data : dict):
+    user = usermanage.search_user(data["user_id"])
+    card_name = data['card_name']
+    user.payment_info.remove_credit_card(card_name)
+    return user.payment_info
 
+@app.post("/user/add_paypal/{user_id}", tags=["User Info"])
+async def get_user(data : dict):
+    user = usermanage.search_user(data["user_id"])
+    email = data['email']
+    password = data['password']
+    user.payment_info.add_paypal(Paypal(email, password))
+    return user.payment_info
+    
+@app.delete("/user/remove_paypal/{user_id}", tags=["User Info"])
+async def get_user(data : dict):
+    user = usermanage.search_user(data["user_id"])
+    email = data['email']
+    user.payment_info.remove_paypal(email)
+    return user.payment_info
+
+@app.post("/user/update_user_info/{user_id}", tags=["User Info"])
+async def get_user(data : dict):
+    user = usermanage.search_user(data["user_id"])
+    if data["username"] != '':
+        user.user_info.username = data["username"]
+    if data["password"] != '':
+        user.user_info.password = data["password"]
+    if data["email"] != '':
+        user.user_info.email = data["email"]
+    return user.user_info
 #Shoppingcart
-#view cart
 @app.get("/cart/{user_id}", tags=["Shoppingcart"])
-async def view_cart():
-    user_id = current_user.user.user_info.user_id
-    for user in usermanage.users:
-        if user.user_info.user_id == user_id:
-            return user.shopping_info.user_cart 
-#get total price
+async def view_cart(user_id : int):
+    user = usermanage.search_user(user_id)
+    return user.shopping_info.user_cart.items 
+
 @app.get("/cart/get_total_price/{user_id}", tags=["Shoppingcart"])
-async def get_total_price():
-    user_id = current_user.user.user_info.user_id
-    for user in usermanage.users:
-        if user.user_info.user_id == user_id:
-            return user.shopping_info.user_cart.get_total_price()
-#add to cart
+async def get_total_price(user_id : int):
+    user = usermanage.search_user(user_id)
+    return user.shopping_info.user_cart.get_total_price()
+
 @app.post("/cart/add_to_cart/{user_id}/{game_title}", tags=["Shoppingcart"])
-async def add_to_cart(game_title: str):
-    user_id = current_user.user.user_info.user_id
-    for user in usermanage.users:
-        if user.user_info.user_id == user_id:
-            user.shopping_info.user_cart.add_item(catalog.search_games(game_title))
-            return f"{game_title} added to cart"
-#remove from cart
+async def add_to_cart(user_id : int, game_title : str):
+    user = usermanage.search_user(user_id)
+    user.shopping_info.user_cart.add_item(catalog.search_games(game_title))
+    return f"{game_title} added to cart"
+
 @app.delete("/cart/remove_from_cart/{user_id}/{game_title}", tags=["Shoppingcart"])
-async def remove_from_cart(game_title: str):
-    user_id = current_user.user.user_info.user_id
-    for user in usermanage.users:
-        if user.user_info.user_id == user_id:
-            user.shopping_info.user_cart.remove_item(catalog.search_games(game_title))
-            return f"{game_title} removed from cart"
-
-
-
+async def remove_from_cart(user_id : int, game_title : str):
+    user = usermanage.search_user(user_id)
+    user.shopping_info.user_cart.remove_item(catalog.search_games(game_title))
+    return f"{game_title} deleted to cart"
 #Wishlist
-#view wishlist
 @app.get("/wishlist/{user_id}", tags=["Wishlist"])
-async def view_wishlist():
-    user_id = current_user.user.user_info.user_id
-    for user in usermanage.users:
-        if user.user_info.user_id == user_id:
-            return user.shopping_info.user_wishlist
-#add to wishlist
+async def view_wishlist(user_id:int):
+    user = usermanage.search_user(user_id)
+    return user.shopping_info.user_wishlist.items
+
 @app.post("/wishlist/add_to_wishlist/{user_id}/{game_title}", tags=["Wishlist"])
-async def add_to_wishlist(game_title: str):
-    user_id = current_user.user.user_info.user_id
-    for user in usermanage.users:
-        if user.user_info.user_id == user_id:
-            user.shopping_info.user_wishlist.add_item(catalog.search_games(game_title))
-            return f"{game_title} added to wishlist"
-#remove from wishlist
+async def add_to_wishlist(user_id : int, game_title : str):
+    user = usermanage.search_user(user_id)
+    user.shopping_info.user_wishlist.add_item(catalog.search_games(game_title))
+    return f"{game_title} added to wishlist"
+
 @app.delete("/wishlist/remove_from_wishlist/{user_id}/{game_title}", tags=["Wishlist"])
-async def remove_from_wishlist(game_title: str):
-    user_id = current_user.user.user_info.user_id
-    for user in usermanage.users:
-        if user.user_info.user_id == user_id:
-            user.shopping_info.user_wishlist.remove_item(catalog.search_games(game_title))
-            return f"{game_title} removed from wishlist"
+async def remove_from_wishlist(user_id : int, game_title : str):
+    user = usermanage.search_user(user_id)
+    user.shopping_info.user_wishlist.remove_item(catalog.search_games(game_title))
+    return f"{game_title} removed from wishlist"
 
+@app.post("/payment/creditcard/{user_id}",tags= ["Pay with credit card"])
+async def pay_cc(data : dict):
+    user_id = data['user_id']
+    name = data['name']
+    card_number = data['card_number']
+    expiration = data['expiration']
+    cvv = data['cvv']
+    save = data['save']
+    game_title = data['game_title']
+    current_user = usermanage.search_user(user_id)
+    current_card = CreditCard(name,card_number,expiration,cvv)
+    current_purchase = Purchase(current_user)
+    if game_title == 'no':
+        current_purchase.cart_purchase_CC(current_card,save)
+        current_user.shopping_info.user_cart.items = {}
+    else:
+        game = catalog.search_games(game_title)
+        current_purchase.one_purchase_CC(game,current_card,save)
+    return f'Your Purchase is successfully'
+    
 
+@app.post("/payment/paypal/{user_id}",tags= ["Pay with Paypal"])
+async def pay_cc(data : dict):
+    user_id = data['user_id']
+    email = data['email']
+    password = data['password']
+    save = data['save']
+    game_title = data['game_title']
 
-#Payment
-#view payment info
-@app.get("/payment/{user_id}", tags=["Payment"])
-async def view_payment_info():
-    user_id = current_user.user.user_info.user_id
-    for user in usermanage.users:
-        if user.user_info.user_id == user_id:
-            return user.payment_info
-#add credit card
-@app.post("/payment/add_credit_card", tags=["Payment"])
-async def add_credit_card(name: str, card_number: int, expiration_date: str, cvv: int):
-    user_id = current_user.user.user_info.user_id
-    for user in usermanage.users:
-        if user.user_info.user_id == user_id:
-            user.payment_info.add_credit_card(CreditCard(name, card_number, expiration_date, cvv))
-            return "credit card added"
-    return {"error": "User not found"}
-#add paypal
-@app.post("/payment/add_paypal", tags=["Payment"])
-async def add_paypal(paypal_email: str, paypal_password: int):
-    user_id = current_user.user.user_info.user_id
-    for user in usermanage.users:
-        if user.user_info.user_id == user_id:
-            user.payment_info.add_paypal(Paypal(paypal_email, paypal_password))
-            return "paypal added"
-    return {"error": "User not found"}
-#check out
-@app.put("/payment/check_out", tags=["Payment"])
-async def check_out(select_payment: int):
-    user_id = current_user.user.user_info.user_id
-    for user in usermanage.users:
-        if user.user_info.user_id == user_id:
-            if select_payment == 1:
-                user.shopping_info.user_cart.clear_items
-                return f"total amount = {user.shopping_info.user_cart.get_total_price()} successfully paid by credit card"
-            elif select_payment == 2:
-                user.shopping_info.user_cart.clear_items
-                return f"total amound = {user.shopping_info.user_cart.get_total_price()} successfully paid by paypal"
-    return {"error": "Invalid input"}
+    current_user = usermanage.search_user(user_id)
+    current_pp = Paypal(email,password)
+    current_purchase = Purchase(current_user)
+    if game_title == 'no':
+        current_purchase.cart_purchase_PP(current_pp,save)
+        current_user.shopping_info.user_cart.items = {}
+    else:
+        game = catalog.search_games(game_title)
+        current_purchase.one_purchase_PP(game,current_pp,save)
+    return f'Your Purchase is successfully'
+
+# python3 -m uvicorn api:app --reload
